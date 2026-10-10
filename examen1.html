@@ -1,0 +1,550 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control de despachos · Distribuidora La Quinta S.A.S.</title>
+<style>
+:root{
+  --blue:#0B3A82; --blue-dark:#082B63; --blue-mid:#2F5FB3; --blue-soft:#E8EFFA; --blue-line:#C9D6EC;
+  --ink:#0F172A; --muted:#475569; --bg:#F3F6FB; --white:#FFFFFF;
+  --red:#B3261E; --red-soft:#FCEAE8; --amber:#7A4F00; --amber-soft:#FFF3D1; --gray-soft:#E9ECF1;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.top{background:var(--blue);color:#fff}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:18px;padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;border-radius:10px;background:#fff;color:var(--blue);display:grid;place-items:center;font-weight:700;font-size:17px;letter-spacing:.5px}
+h1{font-size:21px;margin:0;line-height:1.2}
+.brand p{margin:2px 0 0;font-size:13px;opacity:.85}
+.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+.ghost:hover{background:rgba(255,255,255,.12)}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tabs button{background:transparent;border:0;color:#fff;opacity:.8;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button:hover{opacity:1}
+.tabs button[aria-selected="true"]{opacity:1;border-bottom-color:#fff}
+main.wrap{padding-top:24px;padding-bottom:40px}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--white);border:1px solid var(--blue-line);border-radius:var(--radius);padding:20px}
+.card h2{font-size:17px;margin:0 0 4px;color:var(--blue)}
+.card .sub{margin:0 0 16px;color:var(--muted);font-size:13px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row2{grid-template-columns:1fr}}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 5px}
+input,select{width:100%;padding:10px 11px;border:1px solid #9FB0CC;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:3px solid #9DB9E8;outline-offset:1px;border-color:var(--blue)}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.err{color:var(--red);font-size:12px;margin-top:4px;min-height:0}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--blue-dark)}
+.btn[disabled]{opacity:.6;cursor:wait}
+.btn.sec{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+.btn.sec:hover{background:var(--blue-soft)}
+.btn.sm{padding:7px 12px;font-size:12px}
+.cases{margin-top:18px;padding-top:14px;border-top:1px dashed var(--blue-line)}
+.cases p{margin:0 0 8px;font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue-line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.chip:hover{background:var(--blue-line)}
+.chip small{font-weight:400;color:var(--muted);margin-left:4px}
+.placeholder{color:var(--muted);font-size:14px;padding:28px 8px;text-align:center;border:2px dashed var(--blue-line);border-radius:10px}
+.result{border-radius:10px;padding:16px;border:1px solid}
+.result .head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.result h3{margin:0;font-size:18px}
+.result .msg{margin:6px 0 12px;font-size:14px}
+.r-ok{background:var(--blue-soft);border-color:var(--blue);color:var(--blue-dark)}
+.r-alert{background:var(--amber-soft);border-color:#C58A00;color:var(--amber)}
+.r-bad{background:var(--red-soft);border-color:var(--red);color:#7B1710}
+.r-gray{background:var(--gray-soft);border-color:#69758A;color:#233044}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px;margin:0}
+.dl dt{font-weight:700}.dl dd{margin:0}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.b-ok{background:var(--blue);color:#fff}
+.b-alert{background:#C58A00;color:#fff}
+.b-bad{background:var(--red);color:#fff}
+.b-gray{background:#5A667A;color:#fff}
+.b-soft{background:var(--blue-soft);color:var(--blue)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-right-color:transparent;border-radius:50%;animation:g .7s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes g{to{transform:rotate(360deg)}}
+.loading{padding:30px;text-align:center;color:var(--muted)}
+.loading .spin{border-color:var(--blue);border-right-color:transparent}
+.notice{background:var(--amber-soft);border:1px solid #E2B955;color:var(--amber);padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:16px}
+.notice.bad{background:var(--red-soft);border-color:#E9A9A4;color:#7B1710}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--blue-line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:22px;color:var(--blue);margin-top:2px}
+.kpi span{font-size:12px;color:var(--muted)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
+.bar > div{flex:1 1 170px}.bar label{margin-top:0}
+.bar .grow{flex:2 1 240px}
+.tw{overflow-x:auto;border:1px solid var(--blue-line);border-radius:10px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:var(--blue);color:#fff;text-align:left;padding:10px 12px;white-space:nowrap;font-size:12px;position:sticky;top:0}
+td{padding:9px 12px;border-top:1px solid #E3EAF6;vertical-align:top}
+tbody tr:nth-child(even){background:#F7F9FD}
+tr.low td{background:var(--red-soft)}
+td.n,th.n{text-align:right}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.foot{text-align:center;color:var(--muted);font-size:12px;padding:6px 0 28px}
+dialog{border:0;border-radius:14px;padding:0;max-width:560px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(8,43,99,.35)}
+dialog::backdrop{background:rgba(8,24,56,.55)}
+dialog form{padding:22px}
+dialog h2{margin:0 0 4px;color:var(--blue);font-size:18px}
+.sess{margin-top:20px}
+.sess h2{font-size:15px}
+.mini td,.mini th{padding:7px 10px;font-size:12px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">LQ</div>
+      <div>
+        <h1>Control de despachos</h1>
+        <p>Distribuidora La Quinta S.A.S. · validación de existencias</p>
+      </div>
+    </div>
+    <button class="ghost" id="btnConfig" type="button">Configuración</button>
+  </div>
+  <nav class="wrap tabs" role="tablist" aria-label="Vistas">
+    <button role="tab" data-view="registro" aria-selected="true">Registrar despacho</button>
+    <button role="tab" data-view="historial" aria-selected="false">Historial de movimientos</button>
+    <button role="tab" data-view="inventario" aria-selected="false">Inventario</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ VISTA 1: REGISTRO ============ -->
+  <section id="v-registro" class="view on" role="tabpanel">
+    <div id="avisoConfig"></div>
+    <div class="grid">
+      <div class="card">
+        <h2>Registrar un despacho</h2>
+        <p class="sub">El sistema consulta el inventario, calcula el saldo y decide si el despacho procede. No hace falta verificar nada a mano.</p>
+        <form id="frm" novalidate autocomplete="off">
+          <div class="row2">
+            <div>
+              <label for="solicitante">Solicitante</label>
+              <input id="solicitante" name="solicitante" placeholder="Nombre de quien solicita">
+              <div class="err" data-for="solicitante"></div>
+            </div>
+            <div>
+              <label for="correo">Correo</label>
+              <input id="correo" name="correo" type="email" placeholder="correo@ejemplo.com">
+              <div class="err" data-for="correo"></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div>
+              <label for="codigo_producto">Código del producto</label>
+              <input id="codigo_producto" name="codigo_producto" placeholder="INS-0101">
+              <div class="err" data-for="codigo_producto"></div>
+            </div>
+            <div>
+              <label for="cantidad">Cantidad</label>
+              <input id="cantidad" name="cantidad" type="number" min="1" step="1" inputmode="numeric" placeholder="0">
+              <div class="err" data-for="cantidad"></div>
+            </div>
+          </div>
+          <label for="destino">Destino</label>
+          <input id="destino" name="destino" placeholder="Restaurante, cafetería o sede de destino">
+          <div class="err" data-for="destino"></div>
+          <label for="motivo">Motivo</label>
+          <select id="motivo" name="motivo">
+            <option value="despacho">despacho</option>
+            <option value="traslado entre sedes">traslado entre sedes</option>
+            <option value="avería">avería</option>
+          </select>
+          <div class="actions">
+            <button class="btn" id="btnEnviar" type="submit">Registrar despacho</button>
+            <button class="btn sec" id="btnLimpiar" type="button">Limpiar</button>
+          </div>
+        </form>
+        <div class="cases">
+          <p>Casos de prueba del parcial (cargan el formulario; usted lo envía):</p>
+          <div class="chips" id="chips">
+            <button type="button" class="chip" data-caso="C1">C1<small>INS-0101 · 10</small></button>
+            <button type="button" class="chip" data-caso="C2">C2<small>INS-0102 · 5</small></button>
+            <button type="button" class="chip" data-caso="C3">C3<small>INS-0102 · 50</small></button>
+            <button type="button" class="chip" data-caso="C4">C4<small>INS-9999 · 3</small></button>
+            <button type="button" class="chip" data-caso="C5">C5<small>INS-0204 · 7</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Respuesta del proceso</h2>
+          <p class="sub">Lo que respondió el escenario de Make.</p>
+          <div id="resultado"><div class="placeholder">Aquí aparecerá el resultado: aprobado, con alerta o rechazado.</div></div>
+        </div>
+        <div class="card sess">
+          <h2>Respuestas de esta sesión</h2>
+          <p class="sub">Constancia inmediata de los despachos procesados en esta pestaña.</p>
+          <div id="sesion"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA 2: HISTORIAL ============ -->
+  <section id="v-historial" class="view" role="tabpanel">
+    <div id="avisoHist"></div>
+    <div class="kpis" id="kpisHist"></div>
+    <div class="card">
+      <div class="bar">
+        <div class="grow"><label for="fTexto">Buscar</label><input id="fTexto" placeholder="Producto, destino, solicitante, ID…"></div>
+        <div><label for="fMotivo">Motivo</label>
+          <select id="fMotivo"><option value="">Todos</option></select></div>
+        <div><label for="fResultado">Estado</label>
+          <select id="fResultado"><option value="">Todos</option></select></div>
+        <div style="flex:0 0 auto"><button class="btn sec" id="btnRecargarHist" type="button">Actualizar</button></div>
+      </div>
+      <div class="tw" id="tablaHist"></div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA 3: INVENTARIO ============ -->
+  <section id="v-inventario" class="view" role="tabpanel">
+    <div id="avisoInv"></div>
+    <div class="kpis" id="kpisInv"></div>
+    <div class="card">
+      <div class="bar"><div style="flex:0 0 auto"><button class="btn sec" id="btnRecargarInv" type="button">Actualizar</button></div></div>
+      <div class="tw" id="tablaInv"></div>
+    </div>
+  </section>
+
+</main>
+<div class="foot">Seminario de Actualización · Ingeniería de Sistemas · Grupo 1041A · 2026-2 · Elvis Quiñones y Sebastian Benitez</div>
+
+<!-- ============ CONFIGURACIÓN ============ -->
+<dialog id="dlg">
+  <form method="dialog" id="frmCfg">
+    <h2>Configuración</h2>
+    <p class="sub" style="margin:0 0 6px;color:#475569;font-size:13px">Token y credenciales configuradas.</p>
+    <label for="cfgWebhook">URL del webhook de Make</label>
+    <input id="cfgWebhook" placeholder="https://hook.us2.make.com/…">
+    <label for="cfgToken">Token de Airtable (Personal Access Token)</label>
+    <input id="cfgToken" type="password" placeholder="pat..." autocomplete="off">
+    <div class="hint">Permiso requerido: <b>data.records:read</b> con acceso a la base.</div>
+    <label for="cfgCorreo">Correo para los casos de prueba (opcional)</label>
+    <input id="cfgCorreo" type="email" placeholder="su-correo@ejemplo.com">
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;font-size:13px;font-weight:700">Avanzado: base y tablas</summary>
+      <label for="cfgBase">ID de la base</label><input id="cfgBase">
+      <label for="cfgTInv">Tabla inventario (ID)</label><input id="cfgTInv">
+      <label for="cfgTMov">Tabla movimientos (ID)</label><input id="cfgTMov">
+    </details>
+    <div id="cfgMsg" class="hint" style="min-height:18px"></div>
+    <div class="actions">
+      <button class="btn" value="ok" id="btnGuardarCfg">Guardar</button>
+      <button class="btn sec" type="button" id="btnProbarHoja">Probar lectura de Airtable</button>
+      <button class="btn sec" type="button" id="btnCerrarCfg">Cerrar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+"use strict";
+const CONFIG = {
+  WEBHOOK_URL: "https://hook.us2.make.com/ietkeq2219vflgxnoekp5t8fij8ba1j8",
+  BASE_ID: "appgDvbUqzKjpdph8",
+  TABLA_INVENTARIO: "tblhwLAQv6CYZoOwX",
+  TABLA_MOVIMIENTOS: "tblOdPmKDBs4BDgsz",
+  TOKEN: "patMhwp2Fthjrgh8Q.c78235e29b3b8cf3303fcfd123f481443b022323e0afb9e0b3022490686eeae7",
+  TIMEOUT_MS: 30000
+};
+
+const $ = (s, r = document) => r.querySelector(s); const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+const cfg = () => ({
+  webhook: (store.get("lq_webhook") || CONFIG.WEBHOOK_URL).trim(),
+  base: (store.get("lq_base") || CONFIG.BASE_ID).trim(),
+  tInv: (store.get("lq_tinv") || CONFIG.TABLA_INVENTARIO).trim(),
+  tMov: (store.get("lq_tmov") || CONFIG.TABLA_MOVIMIENTOS).trim(),
+  token: (store.get("lq_token") || CONFIG.TOKEN).trim(),
+  correo: store.get("lq_correo")
+});
+const fmtFecha = d => d instanceof Date && !isNaN(d) ? d.toLocaleString("sv-SE", { timeZone: "America/Bogota" }) : (d ?? "");
+const ahoraBogota = () => new Date().toLocaleString("sv-SE", { timeZone: "America/Bogota" });
+const norm = s => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_|_$/g, "");
+
+/* ---------- lectura directa de Airtable ---------- */
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+function valorCampo(v) {
+  if (v == null) return "";
+  if (typeof v === "string" && ISO.test(v)) { const d = new Date(v); return isNaN(d) ? v : d; }
+  if (Array.isArray(v)) return v.map(x => (typeof x === "object" && x ? (x.name || x.email || x.url || JSON.stringify(x)) : x)).join(", ");
+  if (typeof v === "boolean") return v ? "Sí" : "No";
+  if (typeof v === "object") return v.name || v.email || v.url || JSON.stringify(v);
+  return v;
+}
+async function leerTabla(tabla) {
+  const c = cfg();
+  if (!c.token) throw new Error("SIN_TOKEN");
+  if (!c.base || !tabla) throw new Error("SIN_TABLA");
+  let offset = "", registros = [];
+  do {
+    const url = `https://api.airtable.com/v0/${encodeURIComponent(c.base)}/${encodeURIComponent(tabla)}?pageSize=100${offset ? "&offset=" + encodeURIComponent(offset) : ""}`;
+    let r;
+    try { r = await fetch(url, { headers: { Authorization: "Bearer " + c.token } }); }
+    catch (e) { throw new Error("RED"); }
+    if (r.status === 401 || r.status === 403) throw new Error("PERMISO");
+    if (r.status === 404) throw new Error("NO_TABLA");
+    if (!r.ok) throw new Error("HTTP:" + r.status);
+    const j = await r.json();
+    registros.push(...j.records); offset = j.offset || "";
+  } while (offset);
+  const filas = registros.map(rec => {
+    const o = { __id: rec.id, __creado: new Date(rec.createdTime) };
+    for (const [k, v] of Object.entries(rec.fields || {})) o[k] = valorCampo(v);
+    return o;
+  });
+  const cols = []; filas.forEach(f => Object.keys(f).forEach(k => { if (!k.startsWith("__") && !cols.includes(k)) cols.push(k); }));
+  return { cols, filas };
+}
+
+/* ---------- navegación de pestañas ---------- */
+const vistas = ["registro", "historial", "inventario"];
+function ir(v) {
+  if (!vistas.includes(v)) v = "registro";
+  $$(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view === v));
+  vistas.forEach(x => $("#v-" + x).classList.toggle("on", x === v));   if (v === "historial") cargarHistorial();   if (v === "inventario") cargarInventario(); } $$(".tabs button").forEach(b => b.addEventListener("click", () => ir(b.dataset.view)));
+
+function avisoConfig() { $("#avisoConfig").innerHTML = ""; }
+
+/* ---------- chips y formulario ---------- */
+const CASOS = [
+  { id: "C1", cod: "INS-0101", cant: 10 },
+  { id: "C2", cod: "INS-0102", cant: 5 },
+  { id: "C3", cod: "INS-0102", cant: 50 },
+  { id: "C4", cod: "INS-9999", cant: 3 },
+  { id: "C5", cod: "INS-0204", cant: 7 }
+];
+
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest("[data-caso]"); if (!b) return;
+  const c = CASOS.find(x => x.id === b.dataset.caso);
+  $("#solicitante").value = "Elvis Quiñones";
+  $("#correo").value = cfg().correo || "qelvis223@gmail.com";
+  $("#codigo_producto").value = c.cod;
+  $("#cantidad").value = c.cant;
+  $("#destino").value = "Sede Norte - Cali";
+  $("#motivo").value = "despacho";
+  limpiarErrores();
+  $("#btnEnviar").focus();
+});
+
+$("#btnLimpiar").addEventListener("click", () => { $("#frm").reset(); limpiarErrores(); }); function limpiarErrores() { $$(".err").forEach(e => e.textContent = ""); }
+
+function leerForm() {
+  return {
+    solicitante: $("#solicitante").value.trim(),
+    correo: $("#correo").value.trim(),
+    codigo_producto: $("#codigo_producto").value.trim().toUpperCase(),
+    cantidad: parseInt($("#cantidad").value.trim(), 10) || 0,
+    destino: $("#destino").value.trim(),
+    motivo: $("#motivo").value
+  };
+}
+function validar(f) {
+  const e = {};
+  if (f.solicitante.length < 2) e.solicitante = "Escriba el nombre del solicitante.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.correo)) e.correo = "Escriba un correo válido.";
+  if (!f.codigo_producto) e.codigo_producto = "Escriba el código del producto.";
+  if (f.cantidad < 1) e.cantidad = "La cantidad debe ser un entero mayor que 0.";
+  if (!f.destino) e.destino = "Indique el destino.";
+  return e;
+}
+
+const sesion = [];
+function pintarSesion() {
+  $("#sesion").innerHTML = sesion.length
+    ? `<div class="tw"><table class="mini"><thead><tr><th>Hora</th><th>Código</th><th class="n">Cant.</th><th>Estado</th><th class="n">Tiempo</th></tr></thead><tbody>${
+      sesion.map(s => `<tr><td>${esc(s.hora)}</td><td>${esc(s.cod)}</td><td class="n">${esc(s.cant)}</td><td>${badgeEstado(s.estado)}</td><td class="n">${(s.ms / 1000).toFixed(1)} s</td></tr>`).join("")
+    }</tbody></table></div>`
+    : `<div class="empty">Todavía no hay respuestas en esta sesión.</div>`;
+}
+pintarSesion();
+
+function badgeEstado(est) {
+  const m = { APROBADO: ["b-ok", "APROBADO"], APROBADO_CON_ALERTA: ["b-alert", "APROBADO CON ALERTA"], RECHAZADO: ["b-bad", "RECHAZADO"], ERROR: ["b-bad", "ERROR"] };
+  const [cl, tx] = m[est] || ["b-ok", est];
+  return `<span class="badge ${cl}">${esc(tx)}</span>`;
+}
+
+function estadoDe(val) {
+  const str = typeof val === "object" && val !== null ? (val.estado_despacho || val.resultado || val.status || val.estado || "") : String(val ?? "");
+  const e = norm(str);
+  if (e.includes("ALERTA")) return "APROBADO_CON_ALERTA";
+  if (e.includes("RECHAZ") || e.includes("ERROR")) return "RECHAZADO";
+  if (e.includes("APROB")) return "APROBADO";
+  return "APROBADO";
+}
+
+function pintarResultado(j, est, ms) {
+  const clase = { APROBADO: "r-ok", APROBADO_CON_ALERTA: "r-alert", RECHAZADO: "r-bad", ERROR: "r-bad" }[est] || "r-gray";
+  const titulo = { APROBADO: "Despacho aprobado", APROBADO_CON_ALERTA: "Aprobado con alerta", RECHAZADO: "Despacho rechazado", ERROR: "No se pudo procesar" }[est] || est;
+  const filas = [];
+  const add = (k, v) => { if (v !== undefined && v !== null && v !== "") filas.push(`<dt>${k}</dt><dd>${esc(v)}</dd>`); };
+  add("Código", j.codigo_producto || $("#codigo_producto").value);
+  add("Cantidad", j.cantidad || $("#cantidad").value);
+  add("Destino", $("#destino").value);
+  add("Motivo", $("#motivo").value);
+  if (ms != null) add("Tiempo", (ms / 1000).toFixed(1) + " s");
+
+  $("#resultado").innerHTML = `<div class="result ${clase}" role="status"><div class="head">${badgeEstado(est)}<h3>${esc(titulo)}</h3></div>
+    <p class="msg">${esc(j.mensaje || j.message || "Operación procesada con éxito.")}</p><dl class="dl">${filas.join("")}</dl></div>`;
+}
+
+let enviando = false;
+$("#frm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (enviando) return;
+  limpiarErrores();
+  const f = leerForm(), errs = validar(f);
+  Object.entries(errs).forEach(([k, m]) => { const el = $(`.err[data-for="${k}"]`); if (el) el.textContent = m; });
+  if (Object.keys(errs).length) return;
+
+  const wh = cfg().webhook;
+  const payload = {
+    id_movimiento: "MOV-" + Math.floor(Date.now() / 1000),
+    fecha_hora_solicitud: ahoraBogota(),
+    solicitante: f.solicitante,
+    correo: f.correo,
+    codigo_producto: f.codigo_producto,
+    cantidad: f.cantidad,
+    destino: f.destino,
+    motivo: f.motivo
+  };
+
+  enviando = true;
+  const btn = $("#btnEnviar"); const txtBtn = btn.textContent;
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Validando con Make…';
+  $("#resultado").innerHTML = '<div class="loading"><span class="spin"></span>Validando despacho en tiempo real…</div>';
+
+  const t0 = performance.now();
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
+  const registrar = (estado, ms) => sesion.unshift({ hora: ahoraBogota().slice(11), cod: f.codigo_producto, cant: f.cantidad, estado, ms });
+
+  try {
+    const r = await fetch(wh, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    const txt = await r.text();
+    const ms = performance.now() - t0;
+    let j = null; try { j = JSON.parse(txt); } catch (e) {}
+    const est = j ? estadoDe(j) : "";
+    if (!est) {
+      pintarResultado({ mensaje: txt || "Respuesta recibida" }, "ERROR", ms);
+      registrar("ERROR", ms);
+    } else {
+      pintarResultado(j, est, ms);
+      registrar(est, ms);
+    }
+  } catch (e) {
+    const ms = performance.now() - t0;
+    pintarResultado({ mensaje: "Verifique que el escenario esté en 'Active' en Make." }, "ERROR", ms);
+    registrar("ERROR", ms);
+  } finally {
+    clearTimeout(to); enviando = false; btn.disabled = false; btn.textContent = txtBtn; pintarSesion();
+  }
+});
+
+/* ---------- vista 2: historial con motivo y estado_despacho ---------- */
+const cache = { hist: null, inv: null };
+async function cargarHistorial() {
+  const cont = $("#tablaHist"), c = cfg();
+  if (!c.token) return;
+  cont.innerHTML = '<div class="loading"><span class="spin"></span>Cargando movimientos…</div>';
+  try {
+    cache.hist = await leerTabla(c.tMov);
+    const filas = cache.hist.filas;
+    $("#kpisHist").innerHTML = `<div class="kpi"><span>Movimientos registrados</span><b>${filas.length}</b></div>`;
+    $("#tablaHist").innerHTML = filas.length
+      ? `<table><thead><tr><th>ID</th><th>Fecha y hora</th><th>Solicitante</th><th>Código</th><th class="n">Cant.</th><th class="n">Saldo</th><th>Destino</th><th>Motivo</th><th>Estado despacho</th></tr></thead><tbody>${
+        filas.map(f => {
+          const rawEstado = f.estado_despacho || f.resultado || f.estado || "";
+          const estPill = estadoDe(rawEstado);
+          const fechaStr = f.fecha_hora instanceof Date ? fmtFecha(f.fecha_hora) : (f.fecha_hora || fmtFecha(f.__creado));
+          return `<tr>
+            <td>${esc(f.id_movimiento || f.__id)}</td>
+            <td>${esc(fechaStr)}</td>
+            <td>${esc(f.solicitante)}</td>
+            <td>${esc(f.codigo_producto || f.codigo)}</td>
+            <td class="n">${esc(f.cantidad)}</td>
+            <td class="n">${esc(f.saldo_restante !== undefined ? f.saldo_restante : "-")}</td>
+            <td>${esc(f.destino)}</td>
+            <td><span class="badge b-soft">${esc(f.motivo || "despacho")}</span></td>
+            <td>${badgeEstado(estPill)}</td>
+          </tr>`;
+        }).join("")
+      }</tbody></table>`
+      : `<div class="empty">No hay movimientos registrados.</div>`;
+  } catch (e) { cont.innerHTML = `<div class="notice bad">Error al leer Airtable: ${esc(e.message)}</div>`; }
+}
+$("#btnRecargarHist").addEventListener("click", () => cargarHistorial());
+
+/* ---------- vista 3: inventario ---------- */
+async function cargarInventario() {
+  const cont = $("#tablaInv"), c = cfg();
+  if (!c.token) return;
+  cont.innerHTML = '<div class="loading"><span class="spin"></span>Cargando inventario…</div>';
+  try {
+    cache.inv = await leerTabla(c.tInv);
+    const f = cache.inv.filas;
+    const bajos = f.filter(x => Number(x.existencias) < Number(x.minimo));
+    $("#kpisInv").innerHTML = `<div class="kpi"><span>Total Productos</span><b>${f.length}</b></div><div class="kpi"><span>Bajo Mínimo</span><b>${bajos.length}</b></div>`;
+    $("#tablaInv").innerHTML = `<table><thead><tr><th>Código</th><th>Producto</th><th>Unidad</th><th class="n">Existencias</th><th class="n">Mínimo</th><th>Estado</th></tr></thead><tbody>${
+      f.map(x => {
+        const ex = Number(x.existencias), mi = Number(x.minimo);
+        const est = ex === 0 ? '<span class="badge b-bad">AGOTADO</span>' : ex < mi ? '<span class="badge b-alert">BAJO MÍNIMO</span>' : '<span class="badge b-soft">NORMAL</span>';
+        return `<tr class="${ex < mi ? 'low' : ''}"><td>${esc(x.codigo)}</td><td>${esc(x.producto)}</td><td>${esc(x.unidad)}</td><td class="n">${esc(x.existencias)}</td><td class="n">${esc(x.minimo)}</td><td>${est}</td></tr>`;
+      }).join("")
+    }</tbody></table>`;
+  } catch (e) { cont.innerHTML = `<div class="notice bad">Error al leer Airtable: ${esc(e.message)}</div>`; }
+}
+$("#btnRecargarInv").addEventListener("click", () => cargarInventario());
+
+/* ---------- configuración dialog ---------- */
+const dlg = $("#dlg");
+$("#btnConfig").addEventListener("click", () => {
+  const c = cfg();
+  $("#cfgWebhook").value = c.webhook; $("#cfgToken").value = c.token; $("#cfgCorreo").value = c.correo;
+  $("#cfgBase").value = c.base; $("#cfgTInv").value = c.tInv; $("#cfgTMov").value = c.tMov;
+  dlg.showModal();
+});
+$("#btnCerrarCfg").addEventListener("click", () => dlg.close());
+$("#btnGuardarCfg").addEventListener("click", () => {
+  store.set("lq_webhook", $("#cfgWebhook").value.trim());
+  store.set("lq_token", $("#cfgToken").value.trim());
+  store.set("lq_correo", $("#cfgCorreo").value.trim());
+  store.set("lq_base", $("#cfgBase").value.trim());
+  store.set("lq_tinv", $("#cfgTInv").value.trim());
+  store.set("lq_tmov", $("#cfgTMov").value.trim());
+  avisoConfig();
+});
+
+avisoConfig();
+ir("registro");
+</script>
+</body>
+</html>
